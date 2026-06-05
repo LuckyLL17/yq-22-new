@@ -197,3 +197,21 @@ export const SORT_FIELD_LABELS: Record<SortField, string> = {
   distance: '距离',
   priceLevel: '价格',
 };
+
+export type MatchStep = 'collecting' | 'filtering' | 'scoring' | 'calculating' | 'sorting' | 'complete';
+
+export interface MatchStepInfo {
+  key: MatchStep;
+  label: string;
+  description: string;
+  icon: string;
+}
+
+export const MATCH_STEPS: MatchStepInfo[] = [
+  { key: 'collecting', label: '收集偏好', description: '整理所有人的饮食偏好', icon: '📋' },
+  { key: 'filtering', label: '筛选餐厅', description: '排除不符合基本条件的餐厅', icon: '🔍' },
+  { key: 'scoring', label: '计算分数', description: '为每个人计算匹配分数', icon: '📊' },
+  { key: 'calculating', label: '综合评估', description: '计算团队整体匹配度', icon: '⚖️' },
+  { key: 'sorting', label: '排序结果', description: '按匹配度从高到低排序', icon: '🏆' },
+  { key: 'complete', label: '匹配完成', description: '为您找到最佳餐厅', icon: '✨' },
+];

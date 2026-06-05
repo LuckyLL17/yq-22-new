@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule } from '@/types';
+import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule, MatchStep, MATCH_STEPS } from '@/types';
 import { matchRestaurants } from '@/utils/matchAlgorithm';
 
 interface StoreState {
   people: Person[];
   matchResults: MatchResult[];
   isMatching: boolean;
+  currentMatchStep: MatchStep;
   weights: WeightConfig;
   historyRecords: MatchRecord[];
   selectedHistoryIds: string[];
@@ -19,8 +20,9 @@ interface StoreState {
   updatePerson: (id: string, updates: Partial<Person>) => void;
   updateWeight: (key: keyof WeightConfig, value: number) => void;
   resetWeights: () => void;
-  performMatch: () => void;
-  clearResults: () => void;
+      performMatch: () => void;
+      setCurrentMatchStep: (step: MatchStep) => void;
+      clearResults: () => void;
   saveMatchRecord: () => void;
   deleteHistoryRecord: (id: string) => void;
   deleteSelectedHistoryRecords: () => void;
@@ -66,6 +68,7 @@ export const useStore = create<StoreState>()(
       people: [],
       matchResults: [],
       isMatching: false,
+      currentMatchStep: 'collecting',
       weights: { ...DEFAULT_WEIGHTS },
       historyRecords: [],
       selectedHistoryIds: [],
@@ -107,20 +110,38 @@ export const useStore = create<StoreState>()(
 
       resetWeights: () => set({ weights: { ...DEFAULT_WEIGHTS } }),
 
+      setCurrentMatchStep: (step) => set({ currentMatchStep: step }),
+
       performMatch: () => {
-        set({ isMatching: true });
-        setTimeout(() => {
-          const results = matchRestaurants(
-            get().people,
-            get().weights,
-            get().favoriteRestaurantIds,
-            get().blacklistRestaurantIds
-          );
-          set({ matchResults: results, isMatching: false });
-          if (results.length > 0) {
-            get().saveMatchRecord();
+        set({ isMatching: true, currentMatchStep: 'collecting' });
+        
+        const steps: MatchStep[] = ['collecting', 'filtering', 'scoring', 'calculating', 'sorting', 'complete'];
+        let stepIndex = 0;
+        
+        const runStep = () => {
+          if (stepIndex < steps.length - 1) {
+            set({ currentMatchStep: steps[stepIndex] });
+            stepIndex++;
+            setTimeout(runStep, 400);
+          } else {
+            const results = matchRestaurants(
+              get().people,
+              get().weights,
+              get().favoriteRestaurantIds,
+              get().blacklistRestaurantIds
+            );
+            set({ 
+              matchResults: results, 
+              isMatching: false, 
+              currentMatchStep: 'complete' 
+            });
+            if (results.length > 0) {
+              get().saveMatchRecord();
+            }
           }
-        }, 800);
+        };
+        
+        setTimeout(runStep, 300);
       },
 
       clearResults: () => set({ matchResults: [] }),

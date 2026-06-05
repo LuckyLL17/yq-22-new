@@ -5,6 +5,7 @@ import Favorites from "@/pages/Favorites";
 import Blacklist from "@/pages/Blacklist";
 import VoteManager from "@/pages/VoteManager";
 import VoteParticipant from "@/pages/VoteParticipant";
+import MatchShare from "@/pages/MatchShare";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/blacklist" element={<Blacklist />} />
         <Route path="/vote-manager" element={<VoteManager />} />
         <Route path="/vote/:voteId" element={<VoteParticipant />} />
+        <Route path="/share/:recordId" element={<MatchShare />} />
       </Routes>
     </Router>
   );

@@ -6,6 +6,8 @@ import { AddPersonForm } from '@/components/AddPersonForm';
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { WeightAdjuster } from '@/components/WeightAdjuster';
 import { FilterSortPanel } from '@/components/FilterSortPanel';
+import { MatchingAnimation } from '@/components/MatchingAnimation';
+import { ShareButton } from '@/components/ShareButton';
 import { useStore } from '@/store/useStore';
 import { VoteRule, FilterConfig, DEFAULT_FILTER_CONFIG, MatchResult } from '@/types';
 
@@ -127,11 +129,7 @@ export default function Home() {
 
         <main className="max-w-4xl mx-auto px-4 py-8">
           {isMatching ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-20 h-20 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin mb-6" />
-              <p className="text-lg text-gray-600">正在为您匹配最佳餐厅...</p>
-              <p className="text-sm text-gray-400 mt-2">分析 {people.length} 人的口味偏好</p>
-            </div>
+            <MatchingAnimation />
           ) : matchResults.length > 0 ? (
             <>
               <div className="bg-gradient-to-r from-primary-500 to-orange-500 rounded-2xl p-6 text-white mb-8 animate-fade-in-up">
@@ -146,6 +144,21 @@ export default function Home() {
                   )}
                 </p>
               </div>
+
+              {matchResults[0] && (
+                <div className="bg-white rounded-2xl p-6 card-shadow mb-6 animate-fade-in-up">
+                  <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Sparkles size={20} className="text-yellow-500" />
+                    分享匹配结果
+                  </h3>
+                  <ShareButton
+                    topResult={matchResults[0]}
+                    people={people}
+                    shareUrl={window.location.origin + '/share/' + (matchResults.length > 0 ? 'current' : '')}
+                    totalResults={matchResults.length}
+                  />
+                </div>
+              )}
 
               <FilterSortPanel
                 filterConfig={filterConfig}

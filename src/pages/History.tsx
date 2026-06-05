@@ -12,11 +12,13 @@ import {
   Star,
   Clock,
   AlertCircle,
+  Share2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { MatchRecord } from '@/types';
 import { RestaurantCard } from '@/components/RestaurantCard';
+import { ShareButton } from '@/components/ShareButton';
 
 function formatDate(timestamp: number): string {
   const date = new Date(timestamp);
@@ -47,6 +49,17 @@ function RecordDetail({ record }: { record: MatchRecord }) {
       </button>
       {expanded && (
         <div className="p-4 space-y-4 bg-white">
+          {record.matchResults[0] && (
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">分享匹配结果</h4>
+              <ShareButton
+                topResult={record.matchResults[0]}
+                people={record.people}
+                shareUrl={window.location.origin + '/share/' + record.id}
+                totalResults={record.matchResults.length}
+              />
+            </div>
+          )}
           <div className="grid gap-4">
             {record.matchResults.map((result, index) => (
               <RestaurantCard key={result.restaurant.id} result={result} index={index} />
@@ -239,12 +252,25 @@ export default function HistoryPage() {
                           </div>
                         </div>
 
-                        <button
-                          onClick={() => setRecordToDelete(record.id)}
-                          className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/share/${record.id}`);
+                            }}
+                            className="flex-shrink-0 p-2 text-gray-400 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition-colors"
+                            title="查看分享页面"
+                          >
+                            <Share2 size={18} />
+                          </button>
+                          <button
+                            onClick={() => setRecordToDelete(record.id)}
+                            className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            title="删除记录"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
