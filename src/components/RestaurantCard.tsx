@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Star, MapPin, AlertCircle, CheckCircle, Heart, Ban } from 'lucide-react';
-import { MatchResult, SPICY_LABELS } from '@/types';
+import { ChevronDown, ChevronUp, Star, MapPin, AlertCircle, CheckCircle, Heart, Ban, DollarSign } from 'lucide-react';
+import { MatchResult, SPICY_LABELS, PRICE_LABELS } from '@/types';
 import { MatchScore } from './MatchScore';
 import { useStore } from '@/store/useStore';
 
@@ -76,9 +76,21 @@ export function RestaurantCard({ result, index }: RestaurantCardProps) {
       </div>
 
       <div className="p-5">
-        <div className="flex items-center gap-1 text-gray-500 text-sm mb-4">
-          <MapPin size={14} />
-          <span>{restaurant.address}</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-1 text-gray-500 text-sm">
+            <MapPin size={14} />
+            <span>{restaurant.address}</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="flex items-center gap-1 text-orange-500 font-medium">
+              <DollarSign size={14} />
+              {PRICE_LABELS[restaurant.priceLevel]}
+            </span>
+            <span className="flex items-center gap-1 text-blue-500">
+              <MapPin size={14} />
+              {restaurant.distance}km
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">

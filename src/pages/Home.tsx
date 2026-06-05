@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban, Vote, Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { WeightAdjuster } from '@/components/WeightAdjuster';
+import { FilterSortPanel } from '@/components/FilterSortPanel';
 import { useStore } from '@/store/useStore';
-import { VoteRule } from '@/types';
+import { VoteRule, FilterConfig, DEFAULT_FILTER_CONFIG, MatchResult } from '@/types';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -19,6 +20,61 @@ export default function Home() {
     maxVotesPerPerson: 2,
     hideResultsUntilEnd: true,
   });
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ ...DEFAULT_FILTER_CONFIG });
+
+  const filteredAndSortedResults = useMemo(() => {
+    let results = [...matchResults];
+
+    if (filterConfig.priceRange[0] !== null) {
+      results = results.filter(r => r.restaurant.priceLevel >= filterConfig.priceRange[0]!);
+    }
+    if (filterConfig.priceRange[1] !== null) {
+      results = results.filter(r => r.restaurant.priceLevel <= filterConfig.priceRange[1]!);
+    }
+
+    if (filterConfig.maxDistance !== null) {
+      results = results.filter(r => r.restaurant.distance <= filterConfig.maxDistance!);
+    }
+
+    if (filterConfig.minRating !== null) {
+      results = results.filter(r => r.restaurant.rating >= filterConfig.minRating!);
+    }
+
+    if (filterConfig.minMatchScore !== null) {
+      results = results.filter(r => r.matchScore >= filterConfig.minMatchScore!);
+    }
+
+    results.sort((a, b) => {
+      let aVal: number;
+      let bVal: number;
+
+      switch (filterConfig.sortField) {
+        case 'matchScore':
+          aVal = a.matchScore;
+          bVal = b.matchScore;
+          break;
+        case 'rating':
+          aVal = a.restaurant.rating;
+          bVal = b.restaurant.rating;
+          break;
+        case 'distance':
+          aVal = a.restaurant.distance;
+          bVal = b.restaurant.distance;
+          break;
+        case 'priceLevel':
+          aVal = a.restaurant.priceLevel;
+          bVal = b.restaurant.priceLevel;
+          break;
+        default:
+          aVal = a.matchScore;
+          bVal = b.matchScore;
+      }
+
+      return filterConfig.sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+    });
+
+    return results;
+  }, [matchResults, filterConfig]);
 
   const handleMatch = () => {
     performMatch();
@@ -28,6 +84,7 @@ export default function Home() {
   const handleBack = () => {
     setShowResults(false);
     clearResults();
+    setFilterConfig({ ...DEFAULT_FILTER_CONFIG });
   };
 
   const handleQuickCreateVote = () => {
@@ -35,7 +92,11 @@ export default function Home() {
       alert('请输入您的名字');
       return;
     }
-    const restaurantIds = matchResults.slice(0, 5).map(r => r.restaurant.id);
+    const restaurantIds = filteredAndSortedResults.slice(0, 5).map(r => r.restaurant.id);
+    if (restaurantIds.length === 0) {
+      alert('当前筛选条件下没有餐厅可供选择');
+      return;
+    }
     const voteId = createVote(
       '今晚去哪里吃？',
       restaurantIds,
@@ -79,9 +140,17 @@ export default function Home() {
                   <h2 className="font-display font-bold text-xl">匹配完成！</h2>
                 </div>
                 <p className="text-white/80">
-                  共找到 {matchResults.length} 家适合你们的餐厅，按匹配度排序如下：
+                  共找到 {matchResults.length} 家适合你们的餐厅
+                  {filteredAndSortedResults.length !== matchResults.length && (
+                    <span className="ml-1">（筛选后显示 {filteredAndSortedResults.length} 家）</span>
+                  )}
                 </p>
               </div>
+
+              <FilterSortPanel
+                filterConfig={filterConfig}
+                onFilterChange={setFilterConfig}
+              />
 
               <div className="bg-white rounded-2xl p-6 card-shadow mb-8 animate-fade-in-up">
                 <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -170,11 +239,23 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="grid gap-6">
-                {matchResults.map((result, index) => (
-                  <RestaurantCard key={result.restaurant.id} result={result} index={index} />
-                ))}
-              </div>
+              {filteredAndSortedResults.length > 0 ? (
+                <div className="grid gap-6">
+                  {filteredAndSortedResults.map((result, index) => (
+                    <RestaurantCard key={result.restaurant.id} result={result} index={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl p-8 text-center card-shadow">
+                  <p className="text-gray-500 mb-4">没有符合筛选条件的餐厅</p>
+                  <button
+                    onClick={() => setFilterConfig({ ...DEFAULT_FILTER_CONFIG })}
+                    className="px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors"
+                  >
+                    重置筛选条件
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             <div className="text-center py-20">

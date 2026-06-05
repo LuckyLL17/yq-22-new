@@ -13,6 +13,8 @@ export interface Person {
   };
 }
 
+export type PriceLevel = 1 | 2 | 3 | 4;
+
 export interface Restaurant {
   id: string;
   name: string;
@@ -24,6 +26,8 @@ export interface Restaurant {
   tags: string[];
   rating: number;
   address: string;
+  priceLevel: PriceLevel;
+  distance: number;
 }
 
 export interface DissatisfiedPerson {
@@ -158,3 +162,38 @@ export interface VoteState {
   votes: Vote[];
   currentVoteId: string | null;
 }
+
+export type SortField = 'matchScore' | 'rating' | 'distance' | 'priceLevel';
+export type SortOrder = 'asc' | 'desc';
+
+export interface FilterConfig {
+  sortField: SortField;
+  sortOrder: SortOrder;
+  priceRange: [PriceLevel | null, PriceLevel | null];
+  maxDistance: number | null;
+  minRating: number | null;
+  minMatchScore: number | null;
+}
+
+export const DEFAULT_FILTER_CONFIG: FilterConfig = {
+  sortField: 'matchScore',
+  sortOrder: 'desc',
+  priceRange: [null, null],
+  maxDistance: null,
+  minRating: null,
+  minMatchScore: null,
+};
+
+export const PRICE_LABELS: Record<PriceLevel, string> = {
+  1: '¥',
+  2: '¥¥',
+  3: '¥¥¥',
+  4: '¥¥¥¥',
+};
+
+export const SORT_FIELD_LABELS: Record<SortField, string> = {
+  matchScore: '匹配度',
+  rating: '评分',
+  distance: '距离',
+  priceLevel: '价格',
+};

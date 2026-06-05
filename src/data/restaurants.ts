@@ -12,6 +12,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['川菜', '辣', '地道'],
     rating: 4.5,
     address: '市中心美食街88号',
+    priceLevel: 2,
+    distance: 0.8,
   },
   {
     id: '2',
@@ -24,6 +26,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['粤菜', '清淡', '茶点'],
     rating: 4.7,
     address: '商业中心2楼',
+    priceLevel: 3,
+    distance: 1.2,
   },
   {
     id: '3',
@@ -36,6 +40,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['湘菜', '辣', '家常菜'],
     rating: 4.3,
     address: '美食城A座15号',
+    priceLevel: 2,
+    distance: 2.1,
   },
   {
     id: '4',
@@ -48,6 +54,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['素食', '健康', '养生'],
     rating: 4.6,
     address: '公园路12号',
+    priceLevel: 2,
+    distance: 1.5,
   },
   {
     id: '5',
@@ -60,6 +68,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['火锅', '聚餐', '热闹'],
     rating: 4.8,
     address: '美食街66号',
+    priceLevel: 3,
+    distance: 0.5,
   },
   {
     id: '6',
@@ -72,6 +82,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['日料', '精致', '海鲜'],
     rating: 4.4,
     address: '国际广场B1层',
+    priceLevel: 4,
+    distance: 3.2,
   },
   {
     id: '7',
@@ -84,6 +96,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['江浙菜', '清淡', '精致'],
     rating: 4.5,
     address: '文化街33号',
+    priceLevel: 3,
+    distance: 1.8,
   },
   {
     id: '8',
@@ -96,6 +110,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['烧烤', '韩式', '聚餐'],
     rating: 4.6,
     address: '大学城美食街',
+    priceLevel: 2,
+    distance: 2.5,
   },
   {
     id: '9',
@@ -108,6 +124,8 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['西餐', '意面', '披萨'],
     rating: 4.3,
     address: '外国人街18号',
+    priceLevel: 4,
+    distance: 4.0,
   },
   {
     id: '10',
@@ -120,5 +138,7 @@ export const RESTAURANTS: Restaurant[] = [
     tags: ['东北菜', '饺子', '实惠'],
     rating: 4.4,
     address: '老城区老街5号',
+    priceLevel: 1,
+    distance: 1.0,
   },
 ];
