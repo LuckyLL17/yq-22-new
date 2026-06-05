@@ -1,25 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Vote, Users, CheckCircle, Clock, User, Trophy } from 'lucide-react';
+import { ArrowLeft, Vote, Users, CheckCircle, Clock, User, Trophy, Crown, RefreshCw, Square } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { RESTAURANTS } from '@/data/restaurants';
 
 export default function VoteParticipant() {
   const { voteId } = useParams<{ voteId: string }>();
-  const { getVote, castVote, votes } = useStore();
+  const { getVote, castVote, votes, endVote } = useStore();
   const [voterName, setVoterName] = useState('');
   const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
   const [hasVoted, setHasVoted] = useState(false);
-  const [voterId] = useState(() => 'voter-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+  const [voterId] = useState(() => {
+    const storedCreatorId = voteId ? localStorage.getItem('vote_creator_' + voteId) : null;
+    return storedCreatorId || 'voter-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  });
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   const vote = votes.find(v => v.id === voteId);
+  const isCreator = vote && vote.creatorId === voterId;
+
+  const refresh = useCallback(() => {
+    setLastUpdate(Date.now());
+  }, []);
 
   useEffect(() => {
     if (vote && vote.votes[voterId]) {
       setHasVoted(true);
       setSelectedRestaurants(vote.votes[voterId]);
     }
-  }, [vote, voterId]);
+  }, [vote, voterId, lastUpdate]);
 
   if (!vote) {
     return (
@@ -90,6 +99,8 @@ export default function VoteParticipant() {
       minute: '2-digit',
     });
 
+  const canSeeResults = !vote.rules.hideResultsUntilEnd || !vote.isActive || isCreator;
+
   return (
     <div className="min-h-screen pb-8">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
@@ -99,7 +110,15 @@ export default function VoteParticipant() {
               <ArrowLeft size={20} />
               <span>返回</span>
             </Link>
-            <h1 className="font-display font-bold text-xl text-gray-800">餐厅投票</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-display font-bold text-xl text-gray-800">餐厅投票</h1>
+              {isCreator && (
+                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium flex items-center gap-1">
+                  <Crown size={12} />
+                  创建者
+                </span>
+              )}
+            </div>
             <div className="w-16" />
           </div>
         </div>
@@ -114,24 +133,46 @@ export default function VoteParticipant() {
           <p className="text-white/80 text-sm mb-4">
             创建者：{vote.creatorName} · {formatDate(vote.createdAt)}
           </p>
-          <div className="flex items-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <Users size={16} />
-              <span>{totalVoters} 人已投票</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <Users size={16} />
+                <span>{totalVoters} 人已投票</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {vote.isActive ? (
+                  <>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    <span>进行中</span>
+                  </>
+                ) : (
+                  <>
+                    <Clock size={16} />
+                    <span>已结束</span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              {vote.isActive ? (
-                <>
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span>进行中</span>
-                </>
-              ) : (
-                <>
-                  <Clock size={16} />
-                  <span>已结束</span>
-                </>
-              )}
-            </div>
+            {isCreator && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={refresh}
+                  className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+                  title="刷新"
+                >
+                  <RefreshCw size={18} />
+                </button>
+                {vote.isActive && (
+                  <button
+                    onClick={() => endVote(vote.id)}
+                    className="px-3 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex items-center gap-1 text-sm"
+                  >
+                    <Square size={14} />
+                    结束投票
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -225,11 +266,18 @@ export default function VoteParticipant() {
               </div>
             )}
 
-            {(!vote.rules.hideResultsUntilEnd || !vote.isActive) && (
+            {canSeeResults && (
               <div className="bg-white rounded-2xl p-6 card-shadow">
-                <h3 className="font-bold text-gray-800 mb-4">
-                  {vote.isActive ? '实时投票进度' : '投票结果'}
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-gray-800">
+                    {vote.isActive ? '实时投票进度' : '投票结果'}
+                  </h3>
+                  {isCreator && vote.rules.hideResultsUntilEnd && vote.isActive && (
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">
+                      仅创建者可见
+                    </span>
+                  )}
+                </div>
                 <div className="space-y-3">
                   {results.map(([restaurantId, count], index) => {
                     const restaurant = RESTAURANTS.find(r => r.id === restaurantId);
@@ -287,7 +335,7 @@ export default function VoteParticipant() {
               </div>
             )}
 
-            {vote.rules.hideResultsUntilEnd && vote.isActive && (
+            {!canSeeResults && (
               <div className="bg-orange-50 rounded-2xl p-8 text-center">
                 <Clock size={48} className="text-orange-500 mx-auto mb-4" />
                 <h3 className="font-bold text-orange-800 text-lg mb-2">结果已隐藏</h3>

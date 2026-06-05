@@ -6,6 +6,7 @@ import { AddPersonForm } from '@/components/AddPersonForm';
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { WeightAdjuster } from '@/components/WeightAdjuster';
 import { useStore } from '@/store/useStore';
+import { VoteRule } from '@/types';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -13,6 +14,11 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [showQuickVote, setShowQuickVote] = useState(false);
   const [creatorName, setCreatorName] = useState('');
+  const [voteRules, setVoteRules] = useState<VoteRule>({
+    allowMultiple: true,
+    maxVotesPerPerson: 2,
+    hideResultsUntilEnd: true,
+  });
 
   const handleMatch = () => {
     performMatch();
@@ -33,7 +39,7 @@ export default function Home() {
     const voteId = createVote(
       '今晚去哪里吃？',
       restaurantIds,
-      { allowMultiple: true, maxVotesPerPerson: 2, hideResultsUntilEnd: true },
+      voteRules,
       creatorName
     );
     navigate(`/vote/${voteId}`);
@@ -83,17 +89,60 @@ export default function Home() {
                   发起团队投票
                 </h3>
                 {showQuickVote ? (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <p className="text-sm text-gray-500">
                       将前 5 家餐厅加入投票，让团队成员一起决定
                     </p>
-                    <input
-                      type="text"
-                      value={creatorName}
-                      onChange={e => setCreatorName(e.target.value)}
-                      placeholder="输入您的名字"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">您的称呼</label>
+                      <input
+                        type="text"
+                        value={creatorName}
+                        onChange={e => setCreatorName(e.target.value)}
+                        placeholder="输入您的名字"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+                      <h4 className="font-medium text-gray-800">投票规则设置</h4>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <span className="font-medium text-gray-800 text-sm">允许多选</span>
+                          <p className="text-xs text-gray-500">每人可以选择多家餐厅</p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={voteRules.allowMultiple}
+                          onChange={e => setVoteRules(r => ({ ...r, allowMultiple: e.target.checked }))}
+                          className="w-5 h-5 text-primary-500 rounded border-gray-300 focus:ring-primary-500"
+                        />
+                      </label>
+                      {voteRules.allowMultiple && (
+                        <div className="pl-7">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">每人最多投票数</label>
+                          <input
+                            type="number"
+                            min={1}
+                            max={5}
+                            value={voteRules.maxVotesPerPerson}
+                            onChange={e => setVoteRules(r => ({ ...r, maxVotesPerPerson: Math.max(1, Math.min(5, parseInt(e.target.value) || 1)) }))}
+                            className="w-24 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none"
+                          />
+                        </div>
+                      )}
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <span className="font-medium text-gray-800 text-sm">结束后显示结果</span>
+                          <p className="text-xs text-gray-500">投票结束前不显示实时票数（创建者仍可查看）</p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={voteRules.hideResultsUntilEnd}
+                          onChange={e => setVoteRules(r => ({ ...r, hideResultsUntilEnd: e.target.checked }))}
+                          className="w-5 h-5 text-primary-500 rounded border-gray-300 focus:ring-primary-500"
+                        />
+                      </label>
+                    </div>
                     <div className="flex gap-3">
                       <button
                         onClick={() => setShowQuickVote(false)}

@@ -257,9 +257,10 @@ export const useStore = create<StoreState>()(
 
       createVote: (title, restaurantIds, rules, creatorName) => {
         const voteId = Date.now().toString();
+        const creatorId = 'creator-' + voteId;
         const newVote: Vote = {
           id: voteId,
-          creatorId: 'creator-' + Date.now(),
+          creatorId,
           creatorName,
           title,
           restaurantIds,
@@ -271,6 +272,7 @@ export const useStore = create<StoreState>()(
         set((state) => ({
           votes: [...state.votes, newVote],
         }));
+        localStorage.setItem('vote_creator_' + voteId, creatorId);
         return voteId;
       },
 
