@@ -1,6 +1,8 @@
 import { Person, Restaurant, MatchResult, SPICY_LABELS, WeightConfig, DEFAULT_WEIGHTS } from '@/types';
 import { RESTAURANTS } from '@/data/restaurants';
 
+export const FAVORITE_BONUS = 15;
+
 function calculatePersonScore(
   person: Person,
   restaurant: Restaurant,
@@ -46,12 +48,21 @@ function calculatePersonScore(
   return { score: Math.max(0, Math.min(100, score)), reasons };
 }
 
-export function matchRestaurants(people: Person[], weights: WeightConfig = DEFAULT_WEIGHTS): MatchResult[] {
+export function matchRestaurants(
+  people: Person[],
+  weights: WeightConfig = DEFAULT_WEIGHTS,
+  favoriteIds: string[] = [],
+  blacklistIds: string[] = []
+): MatchResult[] {
   if (people.length === 0) return [];
 
   const results: MatchResult[] = [];
 
   for (const restaurant of RESTAURANTS) {
+    if (blacklistIds.includes(restaurant.id)) {
+      continue;
+    }
+
     let totalScore = 0;
     const satisfiedPeople: string[] = [];
     const dissatisfiedPeople: {
@@ -88,7 +99,11 @@ export function matchRestaurants(people: Person[], weights: WeightConfig = DEFAU
 
     if (hasZeroScore) continue;
 
-    const avgScore = Math.round(totalScore / people.length);
+    let avgScore = Math.round(totalScore / people.length);
+
+    if (favoriteIds.includes(restaurant.id)) {
+      avgScore = Math.min(100, avgScore + FAVORITE_BONUS);
+    }
 
     results.push({
       restaurant,

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Star, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, MapPin, AlertCircle, CheckCircle, Heart, Ban } from 'lucide-react';
 import { MatchResult, SPICY_LABELS } from '@/types';
 import { MatchScore } from './MatchScore';
+import { useStore } from '@/store/useStore';
 
 interface RestaurantCardProps {
   result: MatchResult;
@@ -11,6 +12,9 @@ interface RestaurantCardProps {
 export function RestaurantCard({ result, index }: RestaurantCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { restaurant, matchScore, satisfiedPeople, dissatisfiedPeople } = result;
+  const { isFavorite, isBlacklisted, toggleFavorite, toggleBlacklist } = useStore();
+  const favorited = isFavorite(restaurant.id);
+  const blacklisted = isBlacklisted(restaurant.id);
 
   return (
     <div
@@ -23,6 +27,36 @@ export function RestaurantCard({ result, index }: RestaurantCardProps) {
           alt={restaurant.name}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
         />
+        <div className="absolute top-4 left-4 flex gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavorite(restaurant.id);
+            }}
+            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+              favorited
+                ? 'bg-red-500 text-white'
+                : 'bg-white/80 text-gray-600 hover:bg-white'
+            }`}
+            title={favorited ? '取消收藏' : '收藏'}
+          >
+            <Heart size={18} className={favorited ? 'fill-current' : ''} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBlacklist(restaurant.id);
+            }}
+            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+              blacklisted
+                ? 'bg-gray-800 text-white'
+                : 'bg-white/80 text-gray-600 hover:bg-white'
+            }`}
+            title={blacklisted ? '取消拉黑' : '拉黑'}
+          >
+            <Ban size={18} />
+          </button>
+        </div>
         <div className="absolute top-4 right-4">
           <MatchScore score={matchScore} size="lg" />
         </div>

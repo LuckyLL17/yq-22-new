@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History } from 'lucide-react';
+import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
@@ -80,7 +80,21 @@ export default function Home() {
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500 via-orange-500 to-yellow-500 opacity-10" />
         <div className="relative max-w-4xl mx-auto px-4 py-6">
-          <div className="flex justify-end mb-8">
+          <div className="flex justify-end gap-2 mb-8">
+            <Link
+              to="/favorites"
+              className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"
+            >
+              <Heart size={18} />
+              <span className="text-sm font-medium">收藏</span>
+            </Link>
+            <Link
+              to="/blacklist"
+              className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"
+            >
+              <Ban size={18} />
+              <span className="text-sm font-medium">黑名单</span>
+            </Link>
             <Link
               to="/history"
               className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"

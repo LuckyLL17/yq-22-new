@@ -123,3 +123,13 @@ export interface HistoryState {
   records: MatchRecord[];
   selectedRecords: string[];
 }
+
+export interface FavoriteState {
+  restaurantIds: string[];
+  selectedIds: string[];
+}
+
+export interface BlacklistState {
+  restaurantIds: string[];
+  selectedIds: string[];
+}

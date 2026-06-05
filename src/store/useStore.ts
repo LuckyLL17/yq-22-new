@@ -10,6 +10,10 @@ interface StoreState {
   weights: WeightConfig;
   historyRecords: MatchRecord[];
   selectedHistoryIds: string[];
+  favoriteRestaurantIds: string[];
+  selectedFavoriteIds: string[];
+  blacklistRestaurantIds: string[];
+  selectedBlacklistIds: string[];
   addPerson: (person: Omit<Person, 'id'>) => void;
   removePerson: (id: string) => void;
   updatePerson: (id: string, updates: Partial<Person>) => void;
@@ -24,6 +28,22 @@ interface StoreState {
   selectAllHistory: () => void;
   clearHistorySelection: () => void;
   clearAllHistory: () => void;
+  toggleFavorite: (restaurantId: string) => void;
+  isFavorite: (restaurantId: string) => boolean;
+  removeFromFavorites: (restaurantId: string) => void;
+  removeSelectedFromFavorites: () => void;
+  toggleFavoriteSelection: (id: string) => void;
+  selectAllFavorites: () => void;
+  clearFavoriteSelection: () => void;
+  clearAllFavorites: () => void;
+  toggleBlacklist: (restaurantId: string) => void;
+  isBlacklisted: (restaurantId: string) => boolean;
+  removeFromBlacklist: (restaurantId: string) => void;
+  removeSelectedFromBlacklist: () => void;
+  toggleBlacklistSelection: (id: string) => void;
+  selectAllBlacklist: () => void;
+  clearBlacklistSelection: () => void;
+  clearAllBlacklist: () => void;
 }
 
 const AVATAR_EMOJIS = ['😊', '😎', '🤓', '🥳', '😋', '🤗', '😺', '🐱', '🦊', '🐼'];
@@ -41,6 +61,10 @@ export const useStore = create<StoreState>()(
       weights: { ...DEFAULT_WEIGHTS },
       historyRecords: [],
       selectedHistoryIds: [],
+      favoriteRestaurantIds: [],
+      selectedFavoriteIds: [],
+      blacklistRestaurantIds: [],
+      selectedBlacklistIds: [],
 
       addPerson: (person) =>
         set((state) => ({
@@ -76,7 +100,12 @@ export const useStore = create<StoreState>()(
       performMatch: () => {
         set({ isMatching: true });
         setTimeout(() => {
-          const results = matchRestaurants(get().people, get().weights);
+          const results = matchRestaurants(
+            get().people,
+            get().weights,
+            get().favoriteRestaurantIds,
+            get().blacklistRestaurantIds
+          );
           set({ matchResults: results, isMatching: false });
           if (results.length > 0) {
             get().saveMatchRecord();
@@ -135,6 +164,86 @@ export const useStore = create<StoreState>()(
       clearHistorySelection: () => set({ selectedHistoryIds: [] }),
 
       clearAllHistory: () => set({ historyRecords: [], selectedHistoryIds: [] }),
+
+      toggleFavorite: (restaurantId) =>
+        set((state) => ({
+          favoriteRestaurantIds: state.favoriteRestaurantIds.includes(restaurantId)
+            ? state.favoriteRestaurantIds.filter((id) => id !== restaurantId)
+            : [...state.favoriteRestaurantIds, restaurantId],
+        })),
+
+      isFavorite: (restaurantId) => get().favoriteRestaurantIds.includes(restaurantId),
+
+      removeFromFavorites: (restaurantId) =>
+        set((state) => ({
+          favoriteRestaurantIds: state.favoriteRestaurantIds.filter((id) => id !== restaurantId),
+          selectedFavoriteIds: state.selectedFavoriteIds.filter((id) => id !== restaurantId),
+        })),
+
+      removeSelectedFromFavorites: () =>
+        set((state) => ({
+          favoriteRestaurantIds: state.favoriteRestaurantIds.filter(
+            (id) => !state.selectedFavoriteIds.includes(id)
+          ),
+          selectedFavoriteIds: [],
+        })),
+
+      toggleFavoriteSelection: (id) =>
+        set((state) => ({
+          selectedFavoriteIds: state.selectedFavoriteIds.includes(id)
+            ? state.selectedFavoriteIds.filter((i) => i !== id)
+            : [...state.selectedFavoriteIds, id],
+        })),
+
+      selectAllFavorites: () =>
+        set((state) => ({
+          selectedFavoriteIds: [...state.favoriteRestaurantIds],
+        })),
+
+      clearFavoriteSelection: () => set({ selectedFavoriteIds: [] }),
+
+      clearAllFavorites: () =>
+        set({ favoriteRestaurantIds: [], selectedFavoriteIds: [] }),
+
+      toggleBlacklist: (restaurantId) =>
+        set((state) => ({
+          blacklistRestaurantIds: state.blacklistRestaurantIds.includes(restaurantId)
+            ? state.blacklistRestaurantIds.filter((id) => id !== restaurantId)
+            : [...state.blacklistRestaurantIds, restaurantId],
+        })),
+
+      isBlacklisted: (restaurantId) => get().blacklistRestaurantIds.includes(restaurantId),
+
+      removeFromBlacklist: (restaurantId) =>
+        set((state) => ({
+          blacklistRestaurantIds: state.blacklistRestaurantIds.filter((id) => id !== restaurantId),
+          selectedBlacklistIds: state.selectedBlacklistIds.filter((id) => id !== restaurantId),
+        })),
+
+      removeSelectedFromBlacklist: () =>
+        set((state) => ({
+          blacklistRestaurantIds: state.blacklistRestaurantIds.filter(
+            (id) => !state.selectedBlacklistIds.includes(id)
+          ),
+          selectedBlacklistIds: [],
+        })),
+
+      toggleBlacklistSelection: (id) =>
+        set((state) => ({
+          selectedBlacklistIds: state.selectedBlacklistIds.includes(id)
+            ? state.selectedBlacklistIds.filter((i) => i !== id)
+            : [...state.selectedBlacklistIds, id],
+        })),
+
+      selectAllBlacklist: () =>
+        set((state) => ({
+          selectedBlacklistIds: [...state.blacklistRestaurantIds],
+        })),
+
+      clearBlacklistSelection: () => set({ selectedBlacklistIds: [] }),
+
+      clearAllBlacklist: () =>
+        set({ blacklistRestaurantIds: [], selectedBlacklistIds: [] }),
     }),
     {
       name: 'restaurant-match-storage',
@@ -142,6 +251,8 @@ export const useStore = create<StoreState>()(
         historyRecords: state.historyRecords,
         people: state.people,
         weights: state.weights,
+        favoriteRestaurantIds: state.favoriteRestaurantIds,
+        blacklistRestaurantIds: state.blacklistRestaurantIds,
       }),
     }
   )
