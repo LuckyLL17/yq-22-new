@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Utensils, Sparkles, ArrowLeft, Users, Sliders } from 'lucide-react';
+import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
 import { RestaurantCard } from '@/components/RestaurantCard';
@@ -78,7 +79,16 @@ export default function Home() {
     <div className="min-h-screen pb-48">
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500 via-orange-500 to-yellow-500 opacity-10" />
-        <div className="relative max-w-4xl mx-auto px-4 py-12">
+        <div className="relative max-w-4xl mx-auto px-4 py-6">
+          <div className="flex justify-end mb-8">
+            <Link
+              to="/history"
+              className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"
+            >
+              <History size={18} />
+              <span className="text-sm font-medium">历史记录</span>
+            </Link>
+          </div>
           <div className="text-center animate-fade-in-up">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-500 rounded-2xl mb-6 shadow-lg shadow-primary-500/30">
               <Utensils size={32} className="text-white" />

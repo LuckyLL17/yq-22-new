@@ -108,3 +108,18 @@ export const WEIGHT_LABELS: Record<keyof WeightConfig, { label: string; descript
     description: "匹配到喜欢菜系时增加的分数",
   },
 };
+
+export interface MatchRecord {
+  id: string;
+  timestamp: number;
+  people: Person[];
+  matchResults: MatchResult[];
+  weights: WeightConfig;
+  topRestaurantName: string;
+  topMatchScore: number;
+}
+
+export interface HistoryState {
+  records: MatchRecord[];
+  selectedRecords: string[];
+}
