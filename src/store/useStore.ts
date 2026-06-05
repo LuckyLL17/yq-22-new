@@ -1,14 +1,17 @@
 import { create } from 'zustand';
-import { Person, MatchResult, SpicyLevel } from '@/types';
+import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS } from '@/types';
 import { matchRestaurants } from '@/utils/matchAlgorithm';
 
 interface StoreState {
   people: Person[];
   matchResults: MatchResult[];
   isMatching: boolean;
+  weights: WeightConfig;
   addPerson: (person: Omit<Person, 'id'>) => void;
   removePerson: (id: string) => void;
   updatePerson: (id: string, updates: Partial<Person>) => void;
+  updateWeight: (key: keyof WeightConfig, value: number) => void;
+  resetWeights: () => void;
   performMatch: () => void;
   clearResults: () => void;
 }
@@ -23,6 +26,7 @@ export const useStore = create<StoreState>((set, get) => ({
   people: [],
   matchResults: [],
   isMatching: false,
+  weights: { ...DEFAULT_WEIGHTS },
 
   addPerson: (person) =>
     set((state) => ({
@@ -48,10 +52,17 @@ export const useStore = create<StoreState>((set, get) => ({
       ),
     })),
 
+  updateWeight: (key, value) =>
+    set((state) => ({
+      weights: { ...state.weights, [key]: value },
+    })),
+
+  resetWeights: () => set({ weights: { ...DEFAULT_WEIGHTS } }),
+
   performMatch: () => {
     set({ isMatching: true });
     setTimeout(() => {
-      const results = matchRestaurants(get().people);
+      const results = matchRestaurants(get().people, get().weights);
       set({ matchResults: results, isMatching: false });
     }, 800);
   },

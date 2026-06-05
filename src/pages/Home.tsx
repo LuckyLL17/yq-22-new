@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Utensils, Sparkles, ArrowLeft, Users } from 'lucide-react';
+import { Utensils, Sparkles, ArrowLeft, Users, Sliders } from 'lucide-react';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
 import { RestaurantCard } from '@/components/RestaurantCard';
+import { WeightAdjuster } from '@/components/WeightAdjuster';
 import { useStore } from '@/store/useStore';
 
 export default function Home() {
@@ -120,6 +121,18 @@ export default function Home() {
           )}
 
           <AddPersonForm />
+        </div>
+
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+              <Sliders size={20} className="text-orange-600" />
+            </div>
+            <h2 className="font-display font-bold text-xl text-gray-800">
+              匹配权重设置
+            </h2>
+          </div>
+          <WeightAdjuster />
         </div>
       </main>
 

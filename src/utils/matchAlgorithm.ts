@@ -1,9 +1,10 @@
-import { Person, Restaurant, MatchResult, SPICY_LABELS } from '@/types';
+import { Person, Restaurant, MatchResult, SPICY_LABELS, WeightConfig, DEFAULT_WEIGHTS } from '@/types';
 import { RESTAURANTS } from '@/data/restaurants';
 
 function calculatePersonScore(
   person: Person,
-  restaurant: Restaurant
+  restaurant: Restaurant,
+  weights: WeightConfig
 ): { score: number; reasons: string[] } {
   let score = 100;
   const reasons: string[] = [];
@@ -20,7 +21,7 @@ function calculatePersonScore(
 
   if (restaurant.spicyLevel > person.preferences.spicyLevel) {
     const spicyDiff = restaurant.spicyLevel - person.preferences.spicyLevel;
-    score -= spicyDiff * 25;
+    score -= spicyDiff * weights.spicyPenalty;
     reasons.push(
       `餐厅是${SPICY_LABELS[restaurant.spicyLevel]}，超出接受范围（可接受${
         SPICY_LABELS[person.preferences.spicyLevel]
@@ -30,7 +31,7 @@ function calculatePersonScore(
 
   for (const dislike of person.preferences.dislikes) {
     if (restaurant.ingredients.some((ing) => ing.includes(dislike))) {
-      score -= 20;
+      score -= weights.dislikePenalty;
       reasons.push(`餐厅常用食材包含忌口：${dislike}`);
     }
   }
@@ -39,13 +40,13 @@ function calculatePersonScore(
     person.preferences.favorites.length > 0 &&
     person.preferences.favorites.includes(restaurant.cuisine)
   ) {
-    score += 10;
+    score += weights.favoriteBonus;
   }
 
   return { score: Math.max(0, Math.min(100, score)), reasons };
 }
 
-export function matchRestaurants(people: Person[]): MatchResult[] {
+export function matchRestaurants(people: Person[], weights: WeightConfig = DEFAULT_WEIGHTS): MatchResult[] {
   if (people.length === 0) return [];
 
   const results: MatchResult[] = [];
@@ -62,7 +63,7 @@ export function matchRestaurants(people: Person[]): MatchResult[] {
     let hasZeroScore = false;
 
     for (const person of people) {
-      const { score, reasons } = calculatePersonScore(person, restaurant);
+      const { score, reasons } = calculatePersonScore(person, restaurant, weights);
 
       if (score === 0) {
         hasZeroScore = true;

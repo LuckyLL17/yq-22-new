@@ -81,3 +81,30 @@ export const CUISINE_TYPES = [
   "烧烤",
   "快餐",
 ];
+
+export interface WeightConfig {
+  spicyPenalty: number;
+  dislikePenalty: number;
+  favoriteBonus: number;
+}
+
+export const DEFAULT_WEIGHTS: WeightConfig = {
+  spicyPenalty: 25,
+  dislikePenalty: 20,
+  favoriteBonus: 10,
+};
+
+export const WEIGHT_LABELS: Record<keyof WeightConfig, { label: string; description: string }> = {
+  spicyPenalty: {
+    label: "辣度差异惩罚",
+    description: "每超出一个辣度等级扣除的分数",
+  },
+  dislikePenalty: {
+    label: "忌口食材惩罚",
+    description: "每发现一个忌口食材扣除的分数",
+  },
+  favoriteBonus: {
+    label: "喜欢菜系加成",
+    description: "匹配到喜欢菜系时增加的分数",
+  },
+};
