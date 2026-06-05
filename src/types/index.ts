@@ -133,3 +133,28 @@ export interface BlacklistState {
   restaurantIds: string[];
   selectedIds: string[];
 }
+
+export interface VoteRule {
+  allowMultiple: boolean;
+  maxVotesPerPerson: number;
+  hideResultsUntilEnd: boolean;
+  endTime?: number;
+}
+
+export interface Vote {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  title: string;
+  restaurantIds: string[];
+  rules: VoteRule;
+  votes: Record<string, string[]>;
+  isActive: boolean;
+  createdAt: number;
+  endedAt?: number;
+}
+
+export interface VoteState {
+  votes: Vote[];
+  currentVoteId: string | null;
+}

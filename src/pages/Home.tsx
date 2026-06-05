@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban, Vote, Plus } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
 import { RestaurantCard } from '@/components/RestaurantCard';
@@ -8,8 +8,11 @@ import { WeightAdjuster } from '@/components/WeightAdjuster';
 import { useStore } from '@/store/useStore';
 
 export default function Home() {
-  const { people, removePerson, matchResults, isMatching, performMatch, clearResults } = useStore();
+  const navigate = useNavigate();
+  const { people, removePerson, matchResults, isMatching, performMatch, clearResults, createVote } = useStore();
   const [showResults, setShowResults] = useState(false);
+  const [showQuickVote, setShowQuickVote] = useState(false);
+  const [creatorName, setCreatorName] = useState('');
 
   const handleMatch = () => {
     performMatch();
@@ -19,6 +22,21 @@ export default function Home() {
   const handleBack = () => {
     setShowResults(false);
     clearResults();
+  };
+
+  const handleQuickCreateVote = () => {
+    if (!creatorName.trim()) {
+      alert('请输入您的名字');
+      return;
+    }
+    const restaurantIds = matchResults.slice(0, 5).map(r => r.restaurant.id);
+    const voteId = createVote(
+      '今晚去哪里吃？',
+      restaurantIds,
+      { allowMultiple: true, maxVotesPerPerson: 2, hideResultsUntilEnd: true },
+      creatorName
+    );
+    navigate(`/vote/${voteId}`);
   };
 
   if (showResults) {
@@ -59,6 +77,50 @@ export default function Home() {
                 </p>
               </div>
 
+              <div className="bg-white rounded-2xl p-6 card-shadow mb-8 animate-fade-in-up">
+                <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <Vote size={20} className="text-primary-500" />
+                  发起团队投票
+                </h3>
+                {showQuickVote ? (
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-500">
+                      将前 5 家餐厅加入投票，让团队成员一起决定
+                    </p>
+                    <input
+                      type="text"
+                      value={creatorName}
+                      onChange={e => setCreatorName(e.target.value)}
+                      placeholder="输入您的名字"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowQuickVote(false)}
+                        className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        取消
+                      </button>
+                      <button
+                        onClick={handleQuickCreateVote}
+                        className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-medium hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Plus size={18} />
+                        创建投票
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowQuickVote(true)}
+                    className="w-full py-4 rounded-xl border-2 border-dashed border-primary-200 text-primary-600 font-medium hover:bg-primary-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Vote size={20} />
+                    快速发起投票
+                  </button>
+                )}
+              </div>
+
               <div className="grid gap-6">
                 {matchResults.map((result, index) => (
                   <RestaurantCard key={result.restaurant.id} result={result} index={index} />
@@ -81,6 +143,13 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500 via-orange-500 to-yellow-500 opacity-10" />
         <div className="relative max-w-4xl mx-auto px-4 py-6">
           <div className="flex justify-end gap-2 mb-8">
+            <Link
+              to="/vote-manager"
+              className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"
+            >
+              <Vote size={18} />
+              <span className="text-sm font-medium">投票管理</span>
+            </Link>
             <Link
               to="/favorites"
               className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"

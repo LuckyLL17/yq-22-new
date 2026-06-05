@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord } from '@/types';
+import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule } from '@/types';
 import { matchRestaurants } from '@/utils/matchAlgorithm';
 
 interface StoreState {
@@ -44,6 +44,14 @@ interface StoreState {
   selectAllBlacklist: () => void;
   clearBlacklistSelection: () => void;
   clearAllBlacklist: () => void;
+  votes: Vote[];
+  currentVoteId: string | null;
+  createVote: (title: string, restaurantIds: string[], rules: VoteRule, creatorName: string) => string;
+  castVote: (voteId: string, voterId: string, restaurantIds: string[]) => void;
+  endVote: (voteId: string) => void;
+  deleteVote: (voteId: string) => void;
+  getVote: (voteId: string) => Vote | undefined;
+  setCurrentVoteId: (voteId: string | null) => void;
 }
 
 const AVATAR_EMOJIS = ['😊', '😎', '🤓', '🥳', '😋', '🤗', '😺', '🐱', '🦊', '🐼'];
@@ -65,6 +73,8 @@ export const useStore = create<StoreState>()(
       selectedFavoriteIds: [],
       blacklistRestaurantIds: [],
       selectedBlacklistIds: [],
+      votes: [],
+      currentVoteId: null,
 
       addPerson: (person) =>
         set((state) => ({
@@ -244,6 +254,53 @@ export const useStore = create<StoreState>()(
 
       clearAllBlacklist: () =>
         set({ blacklistRestaurantIds: [], selectedBlacklistIds: [] }),
+
+      createVote: (title, restaurantIds, rules, creatorName) => {
+        const voteId = Date.now().toString();
+        const newVote: Vote = {
+          id: voteId,
+          creatorId: 'creator-' + Date.now(),
+          creatorName,
+          title,
+          restaurantIds,
+          rules,
+          votes: {},
+          isActive: true,
+          createdAt: Date.now(),
+        };
+        set((state) => ({
+          votes: [...state.votes, newVote],
+        }));
+        return voteId;
+      },
+
+      castVote: (voteId, voterId, restaurantIds) =>
+        set((state) => ({
+          votes: state.votes.map((vote) =>
+            vote.id === voteId && vote.isActive
+              ? { ...vote, votes: { ...vote.votes, [voterId]: restaurantIds } }
+              : vote
+          ),
+        })),
+
+      endVote: (voteId) =>
+        set((state) => ({
+          votes: state.votes.map((vote) =>
+            vote.id === voteId
+              ? { ...vote, isActive: false, endedAt: Date.now() }
+              : vote
+          ),
+        })),
+
+      deleteVote: (voteId) =>
+        set((state) => ({
+          votes: state.votes.filter((v) => v.id !== voteId),
+          currentVoteId: state.currentVoteId === voteId ? null : state.currentVoteId,
+        })),
+
+      getVote: (voteId) => get().votes.find((v) => v.id === voteId),
+
+      setCurrentVoteId: (voteId) => set({ currentVoteId: voteId }),
     }),
     {
       name: 'restaurant-match-storage',
@@ -253,6 +310,7 @@ export const useStore = create<StoreState>()(
         weights: state.weights,
         favoriteRestaurantIds: state.favoriteRestaurantIds,
         blacklistRestaurantIds: state.blacklistRestaurantIds,
+        votes: state.votes,
       }),
     }
   )
