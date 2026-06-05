@@ -14,6 +14,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '市中心美食街88号',
     priceLevel: 2,
     distance: 0.8,
+    dishes: [
+      {
+        name: '麻婆豆腐',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mapo%20tofu%20sichuan%20spicy%20dish%20with%20minced%20pork&image_size=square',
+        price: '¥28',
+        description: '经典川菜，麻辣鲜香',
+      },
+      {
+        name: '水煮牛肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sichuan%20boiled%20beef%20in%20chili%20oil%20spicy%20dish&image_size=square',
+        price: '¥58',
+        description: '麻辣过瘾，牛肉嫩滑',
+      },
+      {
+        name: '回锅肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sichuan%20twice%20cooked%20pork%20with%20garlic%20sprouts&image_size=square',
+        price: '¥42',
+        description: '肥而不腻，香辣可口',
+      },
+    ],
+    similarRestaurantIds: ['3', '5'],
+    alternativeRestaurantIds: ['2', '7'],
   },
   {
     id: '2',
@@ -28,6 +50,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '商业中心2楼',
     priceLevel: 3,
     distance: 1.2,
+    dishes: [
+      {
+        name: '虾饺皇',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cantonese%20har%20gow%20shrimp%20dumpling%20dim%20sum&image_size=square',
+        price: '¥38',
+        description: '皮薄馅大，虾肉鲜美',
+      },
+      {
+        name: '流沙包',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cantonese%20custard%20molten%20lava%20bun%20dim%20sum&image_size=square',
+        price: '¥22',
+        description: '金黄流沙，甜而不腻',
+      },
+      {
+        name: '叉烧饭',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cantonese%20bbq%20pork%20char%20siu%20rice%20bowl&image_size=square',
+        price: '¥35',
+        description: '蜜汁叉烧，香甜可口',
+      },
+    ],
+    similarRestaurantIds: ['7', '10'],
+    alternativeRestaurantIds: ['1', '3'],
   },
   {
     id: '3',
@@ -42,6 +86,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '美食城A座15号',
     priceLevel: 2,
     distance: 2.1,
+    dishes: [
+      {
+        name: '剁椒鱼头',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hunan%20chopped%20chili%20fish%20head%20spicy%20dish&image_size=square',
+        price: '¥88',
+        description: '鲜辣过瘾，鱼肉鲜嫩',
+      },
+      {
+        name: '小炒黄牛肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hunan%20stir%20fried%20yellow%20beef%20with%20chili&image_size=square',
+        price: '¥68',
+        description: '香辣下饭，牛肉嫩滑',
+      },
+      {
+        name: '辣椒炒肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hunan%20chili%20fried%20pork%20homestyle%20dish&image_size=square',
+        price: '¥38',
+        description: '经典湘菜，香辣下饭',
+      },
+    ],
+    similarRestaurantIds: ['1', '5'],
+    alternativeRestaurantIds: ['2', '6'],
   },
   {
     id: '4',
@@ -56,6 +122,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '公园路12号',
     priceLevel: 2,
     distance: 1.5,
+    dishes: [
+      {
+        name: '罗汉斋',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=buddhas%20delight%20vegetarian%20stir%20fry%20with%20vegetables&image_size=square',
+        price: '¥48',
+        description: '多种菌菇蔬菜，营养丰富',
+      },
+      {
+        name: '麻婆豆腐（素）',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=vegetarian%20mapo%20tofu%20with%20mushrooms%20spicy&image_size=square',
+        price: '¥28',
+        description: '素食版麻婆豆腐，同样美味',
+      },
+      {
+        name: '时蔬拼盘',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=seasonal%20vegetable%20platter%20healthy%20vegetarian&image_size=square',
+        price: '¥32',
+        description: '清炒时蔬，清爽健康',
+      },
+    ],
+    similarRestaurantIds: ['2', '7'],
+    alternativeRestaurantIds: ['1', '8'],
   },
   {
     id: '5',
@@ -70,6 +158,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '美食街66号',
     priceLevel: 3,
     distance: 0.5,
+    dishes: [
+      {
+        name: '羊肉卷',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20hotpot%20lamb%20slices%20meat%20rolls&image_size=square',
+        price: '¥58',
+        description: '新鲜羊肉，入口即化',
+      },
+      {
+        name: '鸳鸯锅底',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20hotpot%20mandarin%20duck%20split%20broth%20pot&image_size=square',
+        price: '¥48',
+        description: '麻辣清汤各一半',
+      },
+      {
+        name: '毛肚',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20hotpot%20tripe%20beef%20omasum%20dish&image_size=square',
+        price: '¥42',
+        description: '七上八下，爽脆可口',
+      },
+    ],
+    similarRestaurantIds: ['8', '1'],
+    alternativeRestaurantIds: ['6', '9'],
   },
   {
     id: '6',
@@ -84,6 +194,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '国际广场B1层',
     priceLevel: 4,
     distance: 3.2,
+    dishes: [
+      {
+        name: '三文鱼刺身',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=japanese%20salmon%20sashimi%20fresh%20fish%20slices&image_size=square',
+        price: '¥98',
+        description: '新鲜三文鱼，入口即化',
+      },
+      {
+        name: '寿司拼盘',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=japanese%20sushi%20platter%20assorted%20nigiri%20maki&image_size=square',
+        price: '¥128',
+        description: '多种寿司，精致美味',
+      },
+      {
+        name: '天妇罗',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=japanese%20tempura%20shrimp%20vegetables%20fried&image_size=square',
+        price: '¥68',
+        description: '酥脆外皮，鲜嫩内里',
+      },
+    ],
+    similarRestaurantIds: ['9', '7'],
+    alternativeRestaurantIds: ['2', '8'],
   },
   {
     id: '7',
@@ -98,6 +230,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '文化街33号',
     priceLevel: 3,
     distance: 1.8,
+    dishes: [
+      {
+        name: '东坡肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20dongpo%20braised%20pork%20belly%20jiangnan&image_size=square',
+        price: '¥78',
+        description: '肥而不腻，入口即化',
+      },
+      {
+        name: '松鼠鳜鱼',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20squirrel%20fish%20sweet%20sour%20jiangnan%20dish&image_size=square',
+        price: '¥128',
+        description: '外酥里嫩，酸甜可口',
+      },
+      {
+        name: '小笼包',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20xiaolongbao%20soup%20dumplings%20shanghai&image_size=square',
+        price: '¥38',
+        description: '皮薄馅大，汤汁鲜美',
+      },
+    ],
+    similarRestaurantIds: ['2', '10'],
+    alternativeRestaurantIds: ['1', '3'],
   },
   {
     id: '8',
@@ -112,6 +266,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '大学城美食街',
     priceLevel: 2,
     distance: 2.5,
+    dishes: [
+      {
+        name: '烤五花肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=korean%20bbq%20pork%20belly%20samgyeopsal%20grilled&image_size=square',
+        price: '¥48',
+        description: '肥而不腻，香脆可口',
+      },
+      {
+        name: '烤牛肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=korean%20bbq%20marinated%20beef%20bulgogi%20grilled&image_size=square',
+        price: '¥68',
+        description: '腌制入味，鲜嫩多汁',
+      },
+      {
+        name: '石锅拌饭',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=korean%20bibimbap%20stone%20pot%20rice%20vegetables&image_size=square',
+        price: '¥32',
+        description: '锅巴香脆，配料丰富',
+      },
+    ],
+    similarRestaurantIds: ['5', '1'],
+    alternativeRestaurantIds: ['6', '9'],
   },
   {
     id: '9',
@@ -126,6 +302,28 @@ export const RESTAURANTS: Restaurant[] = [
     address: '外国人街18号',
     priceLevel: 4,
     distance: 4.0,
+    dishes: [
+      {
+        name: '玛格丽特披萨',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=italian%20margherita%20pizza%20with%20basil%20tomato%20mozzarella&image_size=square',
+        price: '¥88',
+        description: '经典意式，芝士香浓',
+      },
+      {
+        name: '奶油培根意面',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=italian%20carbonara%20pasta%20with%20bacon%20cream%20sauce&image_size=square',
+        price: '¥68',
+        description: '奶香浓郁，培根香脆',
+      },
+      {
+        name: '牛排',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=italian%20beef%20steak%20with%20vegetables%20fine%20dining&image_size=square',
+        price: '¥168',
+        description: '鲜嫩多汁，熟度可选',
+      },
+    ],
+    similarRestaurantIds: ['6', '2'],
+    alternativeRestaurantIds: ['5', '8'],
   },
   {
     id: '10',
@@ -140,5 +338,27 @@ export const RESTAURANTS: Restaurant[] = [
     address: '老城区老街5号',
     priceLevel: 1,
     distance: 1.0,
+    dishes: [
+      {
+        name: '猪肉白菜饺子',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20pork%20cabbage%20dumplings%20jiaozi%20steamed&image_size=square',
+        price: '¥22',
+        description: '经典馅料，皮薄馅大',
+      },
+      {
+        name: '韭菜鸡蛋饺子',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20chives%20egg%20dumplings%20vegetarian%20jiaozi&image_size=square',
+        price: '¥18',
+        description: '素馅饺子，清香可口',
+      },
+      {
+        name: '锅包肉',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=northeast%20chinese%20guobao%20rou%20sweet%20sour%20pork&image_size=square',
+        price: '¥48',
+        description: '外酥里嫩，酸甜可口',
+      },
+    ],
+    similarRestaurantIds: ['2', '7'],
+    alternativeRestaurantIds: ['3', '1'],
   },
 ];

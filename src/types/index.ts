@@ -15,6 +15,13 @@ export interface Person {
 
 export type PriceLevel = 1 | 2 | 3 | 4;
 
+export interface Dish {
+  name: string;
+  image: string;
+  price: string;
+  description: string;
+}
+
 export interface Restaurant {
   id: string;
   name: string;
@@ -28,6 +35,28 @@ export interface Restaurant {
   address: string;
   priceLevel: PriceLevel;
   distance: number;
+  dishes: Dish[];
+  similarRestaurantIds: string[];
+  alternativeRestaurantIds: string[];
+}
+
+export interface ScoreDetail {
+  category: string;
+  score: number;
+  maxScore: number;
+  description: string;
+  isPenalty: boolean;
+}
+
+export interface PersonScoreDetail {
+  personId: string;
+  personName: string;
+  personAvatar: string;
+  totalScore: number;
+  baseScore: number;
+  details: ScoreDetail[];
+  reasons: string[];
+  isSatisfied: boolean;
 }
 
 export interface DissatisfiedPerson {
@@ -41,6 +70,7 @@ export interface MatchResult {
   matchScore: number;
   satisfiedPeople: string[];
   dissatisfiedPeople: DissatisfiedPerson[];
+  personScores: PersonScoreDetail[];
 }
 
 export const SPICY_LABELS: Record<SpicyLevel, string> = {
