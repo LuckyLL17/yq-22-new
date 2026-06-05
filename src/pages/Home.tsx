@@ -13,7 +13,7 @@ import { VoteRule, FilterConfig, DEFAULT_FILTER_CONFIG, MatchResult } from '@/ty
 
 export default function Home() {
   const navigate = useNavigate();
-  const { people, removePerson, matchResults, isMatching, performMatch, clearResults, createVote } = useStore();
+  const { people, removePerson, matchResults, isMatching, performMatch, clearResults, createVote, historyRecords } = useStore();
   const [showResults, setShowResults] = useState(false);
   const [showQuickVote, setShowQuickVote] = useState(false);
   const [creatorName, setCreatorName] = useState('');
@@ -154,7 +154,7 @@ export default function Home() {
                   <ShareButton
                     topResult={matchResults[0]}
                     people={people}
-                    shareUrl={window.location.origin + '/share/' + (matchResults.length > 0 ? 'current' : '')}
+                    shareUrl={window.location.origin + '/share/' + (historyRecords[0]?.id || 'current')}
                     totalResults={matchResults.length}
                   />
                 </div>

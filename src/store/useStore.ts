@@ -330,6 +330,7 @@ export const useStore = create<StoreState>()(
       partialize: (state) => ({
         historyRecords: state.historyRecords,
         people: state.people,
+        matchResults: state.matchResults,
         weights: state.weights,
         favoriteRestaurantIds: state.favoriteRestaurantIds,
         blacklistRestaurantIds: state.blacklistRestaurantIds,
