@@ -33,33 +33,36 @@ interface ConfettiPiece {
 export function Celebration({ active, duration = 3000 }: CelebrationProps) {
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
   const [sparkles, setSparkles] = useState<{ id: number; left: number; top: number; delay: number; color: string }[]>([]);
+  const [animationKey, setAnimationKey] = useState(0);
 
   const generateConfetti = useCallback(() => {
+    setAnimationKey((prev) => prev + 1);
+    
     const pieces: ConfettiPiece[] = [];
-    const count = 60;
+    const count = 80;
 
     for (let i = 0; i < count; i++) {
       pieces.push({
-        id: i,
+        id: i + Date.now(),
         left: Math.random() * 100,
-        delay: Math.random() * 0.5,
-        duration: 2 + Math.random() * 2,
+        delay: Math.random() * 0.8,
+        duration: 2.5 + Math.random() * 2.5,
         color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
         shape: CONFETTI_SHAPES[Math.floor(Math.random() * CONFETTI_SHAPES.length)],
-        size: 6 + Math.random() * 10,
+        size: 6 + Math.random() * 12,
         rotation: Math.random() * 360,
       });
     }
 
     setConfetti(pieces);
 
-    const sparklePieces = [];
-    for (let i = 0; i < 20; i++) {
+    const sparklePieces: { id: number; left: number; top: number; delay: number; color: string }[] = [];
+    for (let i = 0; i < 30; i++) {
       sparklePieces.push({
-        id: i,
-        left: 20 + Math.random() * 60,
-        top: 20 + Math.random() * 40,
-        delay: Math.random() * 1,
+        id: i + Date.now(),
+        left: 10 + Math.random() * 80,
+        top: 10 + Math.random() * 50,
+        delay: Math.random() * 1.5,
         color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
       });
     }
@@ -73,7 +76,7 @@ export function Celebration({ active, duration = 3000 }: CelebrationProps) {
       const timer = setTimeout(() => {
         setConfetti([]);
         setSparkles([]);
-      }, duration + 1000);
+      }, duration + 1500);
 
       return () => clearTimeout(timer);
     }
@@ -120,7 +123,7 @@ export function Celebration({ active, duration = 3000 }: CelebrationProps) {
   };
 
   return (
-    <>
+    <div key={animationKey} className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
       {confetti.map((piece) => (
         <div
           key={piece.id}
@@ -154,6 +157,6 @@ export function Celebration({ active, duration = 3000 }: CelebrationProps) {
           />
         </div>
       ))}
-    </>
+    </div>
   );
 }

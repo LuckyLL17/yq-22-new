@@ -7,6 +7,7 @@ import VoteManager from "@/pages/VoteManager";
 import VoteParticipant from "@/pages/VoteParticipant";
 import MatchShare from "@/pages/MatchShare";
 import SurprisePage from "@/pages/SurprisePage";
+import RestaurantDetailPage from "@/pages/RestaurantDetailPage";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/vote/:voteId" element={<VoteParticipant />} />
         <Route path="/share/:recordId" element={<MatchShare />} />
         <Route path="/surprise" element={<SurprisePage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
       </Routes>
     </Router>
   );

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, RefreshCw, Heart, Ban, Info, Star, MapPin, DollarSign, UtensilsCrossed, Clock } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Heart, Clock, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SurpriseCard } from '@/components/SurpriseCard';
 import { Celebration } from '@/components/Celebration';
 import { useStore } from '@/store/useStore';
-import { Restaurant, SPICY_LABELS, PRICE_LABELS } from '@/types';
+import { Restaurant } from '@/types';
 
 export default function SurprisePage() {
   const navigate = useNavigate();
@@ -16,8 +16,6 @@ export default function SurprisePage() {
     resetSurpriseForNewDay,
     toggleFavorite,
     isFavorite,
-    isBlacklisted,
-    toggleBlacklist,
   } = useStore();
 
   const [drawCount, setDrawCount] = useState(0);
@@ -26,9 +24,8 @@ export default function SurprisePage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentRestaurant, setCurrentRestaurant] = useState<Restaurant | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [showDetail, setShowDetail] = useState(false);
+  const [celebrationKey, setCelebrationKey] = useState(0);
   const [favorited, setFavorited] = useState(false);
-  const [blacklisted, setBlacklisted] = useState(false);
 
   useEffect(() => {
     resetSurpriseForNewDay();
@@ -40,15 +37,14 @@ export default function SurprisePage() {
       setCurrentRestaurant(savedRestaurant);
       setIsFlipped(true);
       setFavorited(isFavorite(savedRestaurant.id));
-      setBlacklisted(isBlacklisted(savedRestaurant.id));
     }
-  }, [resetSurpriseForNewDay, getSurpriseDrawCount, canDrawSurprise, getCurrentSurpriseRestaurant, isFavorite, isBlacklisted]);
+  }, [resetSurpriseForNewDay, getSurpriseDrawCount, canDrawSurprise, getCurrentSurpriseRestaurant, isFavorite]);
 
   const handleDraw = () => {
     if (isAnimating || !canDraw) return;
 
     setIsAnimating(true);
-    setShowDetail(false);
+    setShowCelebration(false);
 
     if (isFlipped) {
       setIsFlipped(false);
@@ -65,13 +61,13 @@ export default function SurprisePage() {
     if (restaurant) {
       setCurrentRestaurant(restaurant);
       setFavorited(isFavorite(restaurant.id));
-      setBlacklisted(isBlacklisted(restaurant.id));
 
       setTimeout(() => {
         setIsFlipped(true);
       }, 300);
 
       setTimeout(() => {
+        setCelebrationKey((prev) => prev + 1);
         setShowCelebration(true);
         setIsAnimating(false);
         setDrawCount(getSurpriseDrawCount());
@@ -80,7 +76,7 @@ export default function SurprisePage() {
 
       setTimeout(() => {
         setShowCelebration(false);
-      }, 4000);
+      }, 4500);
     } else {
       setIsAnimating(false);
       setCanDraw(false);
@@ -89,7 +85,7 @@ export default function SurprisePage() {
 
   const handleCardClick = () => {
     if (isFlipped && currentRestaurant && !isAnimating) {
-      setShowDetail(!showDetail);
+      navigate(`/restaurant/${currentRestaurant.id}`);
     } else if (!isFlipped) {
       handleDraw();
     }
@@ -103,17 +99,9 @@ export default function SurprisePage() {
     }
   };
 
-  const handleToggleBlacklist = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (currentRestaurant) {
-      toggleBlacklist(currentRestaurant.id);
-      setBlacklisted(!blacklisted);
-    }
-  };
-
   return (
     <div className="min-h-screen pb-24">
-      <Celebration active={showCelebration} duration={3000} />
+      <Celebration key={celebrationKey} active={showCelebration} duration={3000} />
 
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-4 py-4">
@@ -180,7 +168,7 @@ export default function SurprisePage() {
               disabled={!canDraw || isAnimating}
               className={`px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 transition-all ${
                 canDraw && !isAnimating
-                  ? 'bg-gradient-to-r from-primary-500 to-orange-500 text-white hover:shadow-xl hover:shadow-primary-500/30 hover:scale-105 active:scale-95'
+                  ? 'bg-gradient-to-r from-primary-500 to-orange-500 text-white hover:shadow-xl hover:shadow-primary-500/30 hover:scale-105 active:scale-95 animate-pulse-glow'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
@@ -216,133 +204,42 @@ export default function SurprisePage() {
                 {canDraw ? '再抽一次' : '次数用完'}
               </button>
               <button
-                onClick={() => setShowDetail(!showDetail)}
-                className="px-6 py-3 rounded-xl font-medium bg-primary-500 text-white flex items-center gap-2 hover:bg-primary-600 transition-all"
+                onClick={() => currentRestaurant && navigate(`/restaurant/${currentRestaurant.id}`)}
+                className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary-500 to-orange-500 text-white flex items-center gap-2 hover:shadow-lg hover:shadow-primary-500/30 transition-all"
               >
-                <Info size={20} />
-                {showDetail ? '收起详情' : '查看详情'}
+                <ExternalLink size={20} />
+                查看详情
               </button>
             </>
           )}
         </div>
 
-        {isFlipped && currentRestaurant && showDetail && (
-          <div className="bg-white rounded-2xl p-6 card-shadow animate-fade-in-up">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display font-bold text-xl text-gray-800 flex items-center gap-2">
-                <UtensilsCrossed size={24} className="text-primary-500" />
-                餐厅详情
-              </h3>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleToggleFavorite}
-                  className={`p-2 rounded-full transition-all ${
-                    favorited
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                  title={favorited ? '取消收藏' : '收藏'}
-                >
-                  <Heart size={20} className={favorited ? 'fill-current' : ''} />
-                </button>
-                <button
-                  onClick={handleToggleBlacklist}
-                  className={`p-2 rounded-full transition-all ${
-                    blacklisted
-                      ? 'bg-gray-800 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                  title={blacklisted ? '取消拉黑' : '拉黑'}
-                >
-                  <Ban size={20} />
-                </button>
+        {isFlipped && currentRestaurant && (
+          <div className="bg-white rounded-2xl p-5 card-shadow animate-fade-in-up mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={currentRestaurant.image}
+                alt={currentRestaurant.name}
+                className="w-16 h-16 rounded-xl object-cover"
+              />
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-gray-800 truncate">{currentRestaurant.name}</h4>
+                <p className="text-sm text-gray-500">{currentRestaurant.cuisine} · {currentRestaurant.address.slice(0, 10)}...</p>
               </div>
+              <button
+                onClick={handleToggleFavorite}
+                className={`p-2 rounded-full transition-all ${
+                  favorited
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Heart size={18} className={favorited ? 'fill-current' : ''} />
+              </button>
             </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <img
-                  src={currentRestaurant.image}
-                  alt={currentRestaurant.name}
-                  className="w-full h-48 rounded-xl object-cover mb-4"
-                />
-                <h4 className="font-bold text-lg text-gray-800 mb-2">
-                  {currentRestaurant.name}
-                </h4>
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="flex items-center gap-1 text-yellow-500">
-                    <Star size={16} className="fill-current" />
-                    {currentRestaurant.rating}
-                  </span>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-600">{currentRestaurant.cuisine}</span>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-600">{SPICY_LABELS[currentRestaurant.spicyLevel]}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
-                  <MapPin size={16} />
-                  <span>{currentRestaurant.address}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1 text-orange-500 font-medium">
-                    <DollarSign size={16} />
-                    {PRICE_LABELS[currentRestaurant.priceLevel]}
-                  </span>
-                  <span className="flex items-center gap-1 text-blue-500">
-                    <MapPin size={16} />
-                    {currentRestaurant.distance}km
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <h5 className="font-medium text-gray-700 mb-3">招牌菜品</h5>
-                <div className="space-y-3">
-                  {currentRestaurant.dishes.map((dish, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                      <img
-                        src={dish.image}
-                        alt={dish.name}
-                        className="w-16 h-16 rounded-lg object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800 truncate">{dish.name}</p>
-                        <p className="text-sm text-gray-500 truncate">{dish.description}</p>
-                      </div>
-                      <span className="text-orange-500 font-medium">{dish.price}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <h5 className="font-medium text-gray-700 mb-3">餐厅标签</h5>
-              <div className="flex flex-wrap gap-2">
-                {currentRestaurant.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-sm font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <h5 className="font-medium text-gray-700 mb-3">常用食材</h5>
-              <div className="flex flex-wrap gap-2">
-                {currentRestaurant.ingredients.map((ing) => (
-                  <span
-                    key={ing}
-                    className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm"
-                  >
-                    {ing}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <p className="text-sm text-gray-500 text-center">
+              点击卡片或上方按钮查看完整详情 👆
+            </p>
           </div>
         )}
 
