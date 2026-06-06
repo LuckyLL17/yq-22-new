@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban, Vote, Plus, Gift } from 'lucide-react';
+import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban, Vote, Plus, Gift, Calendar } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
@@ -287,8 +287,15 @@ export default function Home() {
         <div className="relative max-w-4xl mx-auto px-4 py-6">
           <div className="flex justify-end gap-2 mb-8 flex-wrap">
             <Link
-              to="/surprise"
+              to="/reservations"
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-orange-500 text-white rounded-xl hover:shadow-lg hover:shadow-primary-500/30 transition-all shadow-sm"
+            >
+              <Calendar size={18} />
+              <span className="text-sm font-medium">餐厅预约</span>
+            </Link>
+            <Link
+              to="/surprise"
+              className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"
             >
               <Gift size={18} />
               <span className="text-sm font-medium">惊喜模式</span>

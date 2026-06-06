@@ -245,3 +245,53 @@ export const MATCH_STEPS: MatchStepInfo[] = [
   { key: 'sorting', label: '排序结果', description: '按匹配度从高到低排序', icon: '🏆' },
   { key: 'complete', label: '匹配完成', description: '为您找到最佳餐厅', icon: '✨' },
 ];
+
+export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+
+export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
+  pending: '待确认',
+  confirmed: '已确认',
+  cancelled: '已取消',
+  completed: '已完成',
+};
+
+export const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
+  pending: 'bg-yellow-100 text-yellow-700',
+  confirmed: 'bg-green-100 text-green-700',
+  cancelled: 'bg-gray-100 text-gray-500',
+  completed: 'bg-blue-100 text-blue-700',
+};
+
+export interface ParticipantTaste {
+  personId: string;
+  personName: string;
+  personAvatar: string;
+  spicyLevel: SpicyLevel;
+  isVegetarian: boolean;
+  dislikes: string[];
+  allergies: string[];
+  favorites: string[];
+}
+
+export interface Reservation {
+  id: string;
+  restaurantId: string | null;
+  restaurantName: string;
+  restaurantImage?: string;
+  restaurantAddress?: string;
+  reservationTime: number;
+  guestCount: number;
+  contactName: string;
+  contactPhone: string;
+  note: string;
+  participantTastes: ParticipantTaste[];
+  status: ReservationStatus;
+  createdAt: number;
+  updatedAt: number;
+  reminderSent: boolean;
+}
+
+export interface ReservationState {
+  reservations: Reservation[];
+  currentReservationId: string | null;
+}

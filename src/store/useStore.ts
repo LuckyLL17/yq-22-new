@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule, MatchStep, MATCH_STEPS, Restaurant } from '@/types';
+import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule, MatchStep, MATCH_STEPS, Restaurant, Reservation, ReservationStatus, ParticipantTaste } from '@/types';
 import { matchRestaurants } from '@/utils/matchAlgorithm';
 import { RESTAURANTS } from '@/data/restaurants';
 
@@ -19,6 +19,8 @@ interface StoreState {
   surpriseDrawCount: number;
   surpriseLastDrawDate: string;
   currentSurpriseRestaurantId: string | null;
+  reservations: Reservation[];
+  currentReservationId: string | null;
   addPerson: (person: Omit<Person, 'id'>) => void;
   removePerson: (id: string) => void;
   updatePerson: (id: string, updates: Partial<Person>) => void;
@@ -63,6 +65,16 @@ interface StoreState {
   drawSurpriseRestaurant: () => Restaurant | null;
   getCurrentSurpriseRestaurant: () => Restaurant | null;
   resetSurpriseForNewDay: () => void;
+  createReservation: (data: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'reminderSent'>) => string;
+  updateReservation: (id: string, updates: Partial<Reservation>) => void;
+  cancelReservation: (id: string) => void;
+  deleteReservation: (id: string) => void;
+  getReservation: (id: string) => Reservation | undefined;
+  setCurrentReservationId: (id: string | null) => void;
+  confirmReservation: (id: string) => void;
+  completeReservation: (id: string) => void;
+  sendReminder: (id: string) => void;
+  importParticipantsFromPeople: (personIds: string[]) => ParticipantTaste[];
 }
 
 const AVATAR_EMOJIS = ['😊', '😎', '🤓', '🥳', '😋', '🤗', '😺', '🐱', '🦊', '🐼'];
@@ -90,6 +102,8 @@ export const useStore = create<StoreState>()(
       surpriseDrawCount: 0,
       surpriseLastDrawDate: '',
       currentSurpriseRestaurantId: null,
+      reservations: [],
+      currentReservationId: null,
 
       addPerson: (person) =>
         set((state) => ({
@@ -396,6 +410,92 @@ export const useStore = create<StoreState>()(
           });
         }
       },
+
+      createReservation: (data) => {
+        const id = Date.now().toString();
+        const now = Date.now();
+        const newReservation: Reservation = {
+          ...data,
+          id,
+          status: 'pending',
+          createdAt: now,
+          updatedAt: now,
+          reminderSent: false,
+        };
+        set((state) => ({
+          reservations: [newReservation, ...state.reservations],
+        }));
+        return id;
+      },
+
+      updateReservation: (id, updates) =>
+        set((state) => ({
+          reservations: state.reservations.map((r) =>
+            r.id === id ? { ...r, ...updates, updatedAt: Date.now() } : r
+          ),
+        })),
+
+      cancelReservation: (id) =>
+        set((state) => ({
+          reservations: state.reservations.map((r) =>
+            r.id === id ? { ...r, status: 'cancelled' as ReservationStatus, updatedAt: Date.now() } : r
+          ),
+        })),
+
+      deleteReservation: (id) =>
+        set((state) => ({
+          reservations: state.reservations.filter((r) => r.id !== id),
+          currentReservationId: state.currentReservationId === id ? null : state.currentReservationId,
+        })),
+
+      getReservation: (id) => get().reservations.find((r) => r.id === id),
+
+      setCurrentReservationId: (id) => set({ currentReservationId: id }),
+
+      confirmReservation: (id) =>
+        set((state) => ({
+          reservations: state.reservations.map((r) =>
+            r.id === id ? { ...r, status: 'confirmed' as ReservationStatus, updatedAt: Date.now() } : r
+          ),
+        })),
+
+      completeReservation: (id) =>
+        set((state) => ({
+          reservations: state.reservations.map((r) =>
+            r.id === id ? { ...r, status: 'completed' as ReservationStatus, updatedAt: Date.now() } : r
+          ),
+        })),
+
+      sendReminder: (id) => {
+        const reservation = get().getReservation(id);
+        if (!reservation || reservation.reminderSent) return;
+        set((state) => ({
+          reservations: state.reservations.map((r) =>
+            r.id === id ? { ...r, reminderSent: true, updatedAt: Date.now() } : r
+          ),
+        }));
+        alert(`已向 ${reservation.contactName} 发送预约提醒：${reservation.restaurantName} 聚餐将于 ${new Date(reservation.reservationTime).toLocaleString()} 开始`);
+      },
+
+      importParticipantsFromPeople: (personIds) => {
+        const { people } = get();
+        return personIds
+          .map((pid) => {
+            const person = people.find((p) => p.id === pid);
+            if (!person) return null;
+            return {
+              personId: person.id,
+              personName: person.name,
+              personAvatar: person.avatar,
+              spicyLevel: person.preferences.spicyLevel,
+              isVegetarian: person.preferences.isVegetarian,
+              dislikes: [...person.preferences.dislikes],
+              allergies: [...person.preferences.allergies],
+              favorites: [...person.preferences.favorites],
+            } as ParticipantTaste;
+          })
+          .filter(Boolean) as ParticipantTaste[];
+      },
     }),
     {
       name: 'restaurant-match-storage',
@@ -410,6 +510,8 @@ export const useStore = create<StoreState>()(
         surpriseDrawCount: state.surpriseDrawCount,
         surpriseLastDrawDate: state.surpriseLastDrawDate,
         currentSurpriseRestaurantId: state.currentSurpriseRestaurantId,
+        reservations: state.reservations,
+        currentReservationId: state.currentReservationId,
       }),
     }
   )

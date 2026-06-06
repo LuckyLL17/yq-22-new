@@ -8,6 +8,8 @@ import VoteParticipant from "@/pages/VoteParticipant";
 import MatchShare from "@/pages/MatchShare";
 import SurprisePage from "@/pages/SurprisePage";
 import RestaurantDetailPage from "@/pages/RestaurantDetailPage";
+import Reservations from "@/pages/Reservations";
+import ReservationDetail from "@/pages/ReservationDetail";
 
 export default function App() {
   return (
@@ -22,6 +24,8 @@ export default function App() {
         <Route path="/share/:recordId" element={<MatchShare />} />
         <Route path="/surprise" element={<SurprisePage />} />
         <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+        <Route path="/reservations" element={<Reservations />} />
+        <Route path="/reservation/:id" element={<ReservationDetail />} />
       </Routes>
     </Router>
   );
