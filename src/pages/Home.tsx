@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban, Vote, Plus } from 'lucide-react';
+import { Utensils, Sparkles, ArrowLeft, Users, Sliders, History, Heart, Ban, Vote, Plus, Gift } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PersonCard } from '@/components/PersonCard';
 import { AddPersonForm } from '@/components/AddPersonForm';
@@ -285,7 +285,14 @@ export default function Home() {
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500 via-orange-500 to-yellow-500 opacity-10" />
         <div className="relative max-w-4xl mx-auto px-4 py-6">
-          <div className="flex justify-end gap-2 mb-8">
+          <div className="flex justify-end gap-2 mb-8 flex-wrap">
+            <Link
+              to="/surprise"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-orange-500 text-white rounded-xl hover:shadow-lg hover:shadow-primary-500/30 transition-all shadow-sm"
+            >
+              <Gift size={18} />
+              <span className="text-sm font-medium">惊喜模式</span>
+            </Link>
             <Link
               to="/vote-manager"
               className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-colors shadow-sm border border-gray-100"
@@ -369,6 +376,45 @@ export default function Home() {
             </h2>
           </div>
           <WeightAdjuster />
+        </div>
+
+        <div className="mb-8 animate-fade-in-up">
+          <Link
+            to="/surprise"
+            className="block bg-gradient-to-r from-primary-500 via-orange-500 to-yellow-500 rounded-2xl p-6 text-white hover:shadow-xl hover:shadow-primary-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
+          >
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-4 right-8 text-6xl group-hover:scale-110 transition-transform">🎁</div>
+              <div className="absolute bottom-4 left-8 text-4xl">✨</div>
+            </div>
+            <div className="relative z-10 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Gift size={24} />
+                  <h3 className="font-display font-bold text-xl">随机惊喜模式</h3>
+                </div>
+                <p className="text-white/80 text-sm">
+                  选择困难？让命运来决定！每天3次免费抽取机会
+                </p>
+              </div>
+              <div className="flex-shrink-0 ml-4">
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <span className="text-2xl">🎰</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative z-10 mt-4 flex items-center gap-2">
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                每日3次机会
+              </span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                翻牌动画
+              </span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                庆祝特效
+              </span>
+            </div>
+          </Link>
         </div>
       </main>
 

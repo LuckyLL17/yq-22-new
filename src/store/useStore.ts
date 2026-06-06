@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule, MatchStep, MATCH_STEPS } from '@/types';
+import { Person, MatchResult, WeightConfig, DEFAULT_WEIGHTS, MatchRecord, Vote, VoteRule, MatchStep, MATCH_STEPS, Restaurant } from '@/types';
 import { matchRestaurants } from '@/utils/matchAlgorithm';
+import { RESTAURANTS } from '@/data/restaurants';
 
 interface StoreState {
   people: Person[];
@@ -15,6 +16,9 @@ interface StoreState {
   selectedFavoriteIds: string[];
   blacklistRestaurantIds: string[];
   selectedBlacklistIds: string[];
+  surpriseDrawCount: number;
+  surpriseLastDrawDate: string;
+  currentSurpriseRestaurantId: string | null;
   addPerson: (person: Omit<Person, 'id'>) => void;
   removePerson: (id: string) => void;
   updatePerson: (id: string, updates: Partial<Person>) => void;
@@ -54,6 +58,11 @@ interface StoreState {
   deleteVote: (voteId: string) => void;
   getVote: (voteId: string) => Vote | undefined;
   setCurrentVoteId: (voteId: string | null) => void;
+  getSurpriseDrawCount: () => number;
+  canDrawSurprise: () => boolean;
+  drawSurpriseRestaurant: () => Restaurant | null;
+  getCurrentSurpriseRestaurant: () => Restaurant | null;
+  resetSurpriseForNewDay: () => void;
 }
 
 const AVATAR_EMOJIS = ['😊', '😎', '🤓', '🥳', '😋', '🤗', '😺', '🐱', '🦊', '🐼'];
@@ -78,6 +87,9 @@ export const useStore = create<StoreState>()(
       selectedBlacklistIds: [],
       votes: [],
       currentVoteId: null,
+      surpriseDrawCount: 0,
+      surpriseLastDrawDate: '',
+      currentSurpriseRestaurantId: null,
 
       addPerson: (person) =>
         set((state) => ({
@@ -324,6 +336,66 @@ export const useStore = create<StoreState>()(
       getVote: (voteId) => get().votes.find((v) => v.id === voteId),
 
       setCurrentVoteId: (voteId) => set({ currentVoteId: voteId }),
+
+      getSurpriseDrawCount: () => {
+        const state = get();
+        const today = new Date().toDateString();
+        if (state.surpriseLastDrawDate !== today) {
+          return 0;
+        }
+        return state.surpriseDrawCount;
+      },
+
+      canDrawSurprise: () => {
+        return get().getSurpriseDrawCount() < 3;
+      },
+
+      drawSurpriseRestaurant: () => {
+        const state = get();
+        const today = new Date().toDateString();
+        
+        const currentCount = state.surpriseLastDrawDate === today ? state.surpriseDrawCount : 0;
+        if (currentCount >= 3) {
+          return null;
+        }
+
+        const availableRestaurants = RESTAURANTS.filter(
+          (r) => !state.blacklistRestaurantIds.includes(r.id)
+        );
+        
+        if (availableRestaurants.length === 0) {
+          return null;
+        }
+
+        const randomIndex = Math.floor(Math.random() * availableRestaurants.length);
+        const restaurant = availableRestaurants[randomIndex];
+
+        set({
+          surpriseDrawCount: currentCount + 1,
+          surpriseLastDrawDate: today,
+          currentSurpriseRestaurantId: restaurant.id,
+        });
+
+        return restaurant;
+      },
+
+      getCurrentSurpriseRestaurant: () => {
+        const state = get();
+        if (!state.currentSurpriseRestaurantId) return null;
+        return RESTAURANTS.find((r) => r.id === state.currentSurpriseRestaurantId) || null;
+      },
+
+      resetSurpriseForNewDay: () => {
+        const today = new Date().toDateString();
+        const state = get();
+        if (state.surpriseLastDrawDate !== today) {
+          set({
+            surpriseDrawCount: 0,
+            surpriseLastDrawDate: today,
+            currentSurpriseRestaurantId: null,
+          });
+        }
+      },
     }),
     {
       name: 'restaurant-match-storage',
@@ -335,6 +407,9 @@ export const useStore = create<StoreState>()(
         favoriteRestaurantIds: state.favoriteRestaurantIds,
         blacklistRestaurantIds: state.blacklistRestaurantIds,
         votes: state.votes,
+        surpriseDrawCount: state.surpriseDrawCount,
+        surpriseLastDrawDate: state.surpriseLastDrawDate,
+        currentSurpriseRestaurantId: state.currentSurpriseRestaurantId,
       }),
     }
   )
